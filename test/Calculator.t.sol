@@ -7,132 +7,131 @@ import "../src/Calculator.sol";
 
 // Contract Test
 contract CalucalorTest is Test {
-  // Objeto contrato + Variables constructor sc
-  Calculator calculator;
-  uint256 public initialResult = 100;
-  address public admin = vm.addr(1);
-  address public randomUser = vm.addr(2);
+    // Objeto contrato + Variables constructor sc
+    Calculator calculator;
+    uint256 public initialResult = 100;
+    address public admin = vm.addr(1);
+    address public randomUser = vm.addr(2);
 
-  // Funcion setup()
-  function setUp() public {
-    calculator = new Calculator(initialResult, admin);
-  }
+    // Funcion setup()
+    function setUp() public {
+        calculator = new Calculator(initialResult, admin);
+    }
 
-  // Unit testing
-  function testCheckInitialResult() public view {
-    uint256 initialResult_ = calculator.result();
-    assert((initialResult_ == initialResult));
-  }
+    // Unit testing
+    function testCheckInitialResult() public view {
+        uint256 initialResult_ = calculator.result();
+        assert((initialResult_ == initialResult));
+    }
 
-  function testAddition() public {
-    uint256 num1_ = 2;
-    uint256 num2_ = 3;
-    
-    uint256 resultado_ = calculator.addition(num1_, num2_);
+    function testAddition() public {
+        uint256 num1_ = 2;
+        uint256 num2_ = 3;
 
-    assert(resultado_ == num1_ + num2_);
-  }
+        uint256 resultado_ = calculator.addition(num1_, num2_);
 
-  function testSubtraction() public {
-    uint256 num1_ = 4;
-    uint256 num2_ = 2;
-    
-    uint256 result_ = calculator.subtraction(num1_, num2_);
+        assert(resultado_ == num1_ + num2_);
+    }
 
-    assert(result_ == num1_- num2_);
-  }
+    function testSubtraction() public {
+        uint256 num1_ = 4;
+        uint256 num2_ = 2;
 
-  function testMultiplication() public {
-    uint256 num1_ = 5;
-    uint256 num2_ = 4;
+        uint256 result_ = calculator.subtraction(num1_, num2_);
 
-    uint256 resultado_ = calculator.multiplication(num1_, num2_);
+        assert(result_ == num1_ - num2_);
+    }
 
-    assert(resultado_ == num1_ * num2_);
-  }
+    function testMultiplication() public {
+        uint256 num1_ = 5;
+        uint256 num2_ = 4;
 
-  function testCannotMultiplication2LargeNumbers() public {
-    uint256 num1_ = 5;
-    uint256 num2_ = type(uint256).max - 1;
+        uint256 resultado_ = calculator.multiplication(num1_, num2_);
 
-    vm.expectRevert();
-    calculator.multiplication(num1_, num2_);
-  }
+        assert(resultado_ == num1_ * num2_);
+    }
 
-  function testDivision() public {
-    uint256 num1_ = 5;
-    uint256 num2_ = 2;
+    function testCannotMultiplication2LargeNumbers() public {
+        uint256 num1_ = 5;
+        uint256 num2_ = type(uint256).max - 1;
 
-    vm.prank(admin);
+        vm.expectRevert();
+        calculator.multiplication(num1_, num2_);
+    }
 
-    uint256 resultado_ = calculator.division(num1_, num2_);
+    function testDivision() public {
+        uint256 num1_ = 5;
+        uint256 num2_ = 2;
 
-    assert(resultado_ == num1_ / num2_);
-  }
+        vm.prank(admin);
 
-  function testIfNotAdminCallsDivisionReverts() public {
-    vm.startPrank(randomUser);
+        uint256 resultado_ = calculator.division(num1_, num2_);
 
-    uint256 num1_ = 5;
-    uint256 num2_ = 2;
+        assert(resultado_ == num1_ / num2_);
+    }
 
-    vm.expectRevert();
-    calculator.division(num1_, num2_);
+    function testIfNotAdminCallsDivisionReverts() public {
+        vm.startPrank(randomUser);
 
-    vm.stopPrank();
-  }
+        uint256 num1_ = 5;
+        uint256 num2_ = 2;
 
-  function testAdminCanCallDivisionCorrrectly() public {
-    vm.startPrank(admin);
+        vm.expectRevert();
+        calculator.division(num1_, num2_);
 
-    uint256 num1_ = 5;
-    uint256 num2_ = 2;
+        vm.stopPrank();
+    }
 
-    calculator.division(num1_, num2_);
+    function testAdminCanCallDivisionCorrrectly() public {
+        vm.startPrank(admin);
 
-    vm.stopPrank();
-  }
+        uint256 num1_ = 5;
+        uint256 num2_ = 2;
 
-  function testDefaultCannotCallDivisionCorrrectly() public {
-    uint256 num1_ = 5;
-    uint256 num2_ = 2;
+        calculator.division(num1_, num2_);
 
-    console.log(msg.sender);
-    vm.expectRevert();
-    calculator.division(num1_, num2_);
-  }
-  
-  function testDefaultExecuteDivisionCorrrectly() public {
-    vm.startPrank(admin);
+        vm.stopPrank();
+    }
 
-    uint256 num1_ = 5;
-    uint256 num2_ = 2;
+    function testDefaultCannotCallDivisionCorrrectly() public {
+        uint256 num1_ = 5;
+        uint256 num2_ = 2;
 
-    uint256 result_ = calculator.division(num1_, num2_);
-    assert(result_ == num1_ / num2_);
+        console.log(msg.sender);
+        vm.expectRevert();
+        calculator.division(num1_, num2_);
+    }
 
-    vm.stopPrank();
-  }
+    function testDefaultExecuteDivisionCorrrectly() public {
+        vm.startPrank(admin);
 
-  function testCannotDividedByZero() public {
-    vm.startPrank(admin);
+        uint256 num1_ = 5;
+        uint256 num2_ = 2;
 
-    uint256 num1_ = 5;
-    uint256 num2_ = 0;
+        uint256 result_ = calculator.division(num1_, num2_);
+        assert(result_ == num1_ / num2_);
 
-    vm.expectRevert();
-    calculator.division(num1_, num2_);
-    
-    vm.stopPrank();
-  }
+        vm.stopPrank();
+    }
 
-  // Fuzzing testing
-  function testFuzzingDivision(uint256 num1_, uint256 num2_) public {
-    vm.startPrank(admin);
+    function testCannotDividedByZero() public {
+        vm.startPrank(admin);
 
-    calculator.division(num1_, num2_);
+        uint256 num1_ = 5;
+        uint256 num2_ = 0;
 
-    vm.stopPrank();
-  }
+        vm.expectRevert();
+        calculator.division(num1_, num2_);
 
+        vm.stopPrank();
+    }
+
+    // Fuzzing testing
+    function testFuzzingDivision(uint256 num1_, uint256 num2_) public {
+        vm.startPrank(admin);
+
+        calculator.division(num1_, num2_);
+
+        vm.stopPrank();
+    }
 }
