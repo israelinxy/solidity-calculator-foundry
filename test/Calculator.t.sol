@@ -128,6 +128,8 @@ contract CalucalorTest is Test {
 
     // Fuzzing testing
     function testFuzzingDivision(uint256 num1_, uint256 num2_) public {
+        vm.assume(num2_ != 0);
+
         vm.startPrank(admin);
 
         calculator.division(num1_, num2_);
